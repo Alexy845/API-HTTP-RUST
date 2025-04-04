@@ -1,0 +1,12 @@
+FROM rust:1.74 AS builder
+WORKDIR /app
+COPY ./Project_API .
+CMD [ "cargo build --release"]
+FROM alpine:latest
+WORKDIR /app
+ENV PING_LISTEN_PORT=8080
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+COPY --from=builder /app/Project_API/target/release/Project_API /app/Project_API
+RUN chown appuser:appgroup /app/Project_API
+USER appuser
+CMD ["/app/Project_API"]
